@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Sole Intel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#f0f0f0;-webkit-tap-highlight-color:transparent;overflow:hidden}
+#app{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;position:relative}
+
+.hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222;background:rgba(10,10,10,.95);position:relative;z-index:10}
+.logo{font-weight:800;font-size:18px;letter-spacing:-0.5px}
+.logo span{color:#10b981}
+.hdr-btn{width:38px;height:38px;border-radius:10px;border:1px solid #333;background:#161616;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#888;font-size:20px}
+.hdr-btn:active{background:rgba(16,185,129,.15);color:#10b981;border-color:#10b981}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.back-btn{padding:0 12px;width:auto;font-size:13px;font-weight:600;gap:6px;display:flex;align-items:center}
+
+.cnt{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+
+.tabs{display:flex;padding:8px 8px 30px;gap:3px;border-top:1px solid #222;background:rgba(10,10,10,.97);position:relative;z-index:10}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;border-radius:10px;border:none;background:none;color:#555;font-size:9px;font-weight:700;cursor:pointer;position:relative;font-family:inherit}
+.tab.on{color:#10b981;background:rgba(16,185,129,.1)}
+.tab:active{transform:scale(.95)}
+.tab-icon{font-size:18px}
+.tab-badge{position:absolute;top:2px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #0a0a0a}
+
+.search{margin:10px 12px 4px;padding:10px 14px;border-radius:10px;border:1px solid #333;background:#141414;color:#f0f0f0;font-size:14px;width:calc(100% - 24px);outline:none;font-family:inherit;-webkit-appearance:none}
+.search:focus{border-color:#10b981}
+.search::placeholder{color:#555}
+
+.sec-hdr{display:flex;justify-content:space-between;padding:14px 16px 6px}
+.sec-t{font-size:11px;font-weight:700;color:#555;letter-spacing:1px}
+
+.stats{display:flex;gap:6px;padding:10px 12px}
+.stat{flex:1;padding:10px;border-radius:10px;background:#141414;border:1px solid #222;text-align:center}
+.stat-v{font-size:22px;font-weight:800;color:#10b981}
+.stat-l{font-size:9px;color:#555;margin-top:2px;font-weight:700}
+
+.card{background:#141414;border:1px solid #222;border-radius:14px;margin:6px 12px;overflow:hidden}
+.card:active{border-color:rgba(16,185,129,.4)}
+.card-top{padding:12px 14px}
+.card-row{display:flex;justify-content:space-between;align-items:flex-start}
+.card-name{font-weight:700;font-size:14px}
+.card-sub{font-size:11px;color:#10b981;font-weight:700;margin-top:1px}
+.card-sub2{font-size:11px;color:#999;margin-top:1px}
+.card-notes{font-size:12px;color:#999;line-height:1.5;margin-top:6px}
+.card-tags{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:10px;padding:3px 8px;border-radius:14px;font-weight:700;display:inline-block}
+.tg{background:rgba(16,185,129,.12);color:#10b981}
+.to{background:rgba(245,158,11,.1);color:#f59e0b}
+.tb{background:rgba(59,130,246,.1);color:#3b82f6}
+.tr{background:rgba(239,68,68,.1);color:#ef4444}
+.card-price{text-align:right}
+.card-price-main{font-weight:800;color:#10b981;font-size:18px}
+.card-price-old{font-size:10px;color:#555;text-decoration:line-through}
+
+.card-acts{display:flex;gap:5px;padding:0 10px 10px}
+.act-btn{flex:1;padding:10px;border-radius:10px;border:1px solid #333;background:#1a1a1a;color:#999;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;font-family:inherit;min-height:42px}
+.act-btn:active{transform:scale(.97);background:rgba(16,185,129,.1);color:#10b981;border-color:#10b981}
+.act-p{background:rgba(16,185,129,.1);color:#10b981;border-color:rgba(16,185,129,.25)}
+
+.alert-box{margin:6px 12px;padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.02));border:1px solid rgba(16,185,129,.2)}
+.alert-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.alert-t{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.alert-dot{width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.radius-row{display:flex;align-items:center;gap:10px;margin:10px 0}
+.radius-row label{font-size:11px;color:#999}
+.radius-row input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:#333;border-radius:2px;outline:none}
+.radius-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#10b981;border:3px solid #0a0a0a}
+.radius-val{font-weight:700;font-size:13px;color:#10b981;min-width:50px;text-align:right}
+
+.nearby{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:10px;background:#141414;border:1px solid #222;margin-bottom:5px;cursor:pointer}
+.nearby:active{border-color:#10b981}
+.nearby-name{font-weight:600;font-size:12px}
+.nearby-store{font-size:10px;color:#f59e0b;margin-top:1px}
+.nearby-addr{font-size:10px;color:#555;margin-top:1px}
+.nearby-dist{font-size:11px;color:#10b981;font-weight:700}
+.nearby-price{font-size:11px;color:#10b981;font-weight:700}
+
+.filters{display:flex;gap:5px;padding:6px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.fchip{padding:5px 12px;border-radius:16px;border:1px solid #333;background:#141414;color:#999;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}
+.fchip.on{background:rgba(16,185,129,.1);color:#10b981;border-color:rgba(16,185,129,.25)}
+.fchip:active{transform:scale(.95)}
+
+.timeline{padding:0 16px}
+.tl-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #222}
+.tl-dot-col{display:flex;flex-direction:column;align-items:center;width:10px;padding-top:4px}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:#10b981}
+.tl-line{width:2px;flex:1;background:#222;margin-top:3px}
+.tl-body{flex:1}
+.tl-store{font-weight:600;font-size:13px}
+.tl-date{font-size:10px;color:#555;margin-top:1px}
+.tl-notes{font-size:12px;color:#999;margin-top:4px;line-height:1.4}
+.tl-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.tl-tag{font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(16,185,129,.12);color:#10b981;font-weight:700}
+.tl-spent{font-size:11px;color:#f59e0b;font-weight:700;margin-top:3px}
+
+.empty{text-align:center;padding:40px 20px;color:#555;font-size:13px}
+
+.detail{padding:16px}
+.detail h2{font-size:20px;font-weight:800;margin-bottom:4px}
+.detail-role{color:#10b981;font-size:12px;font-weight:700}
+.detail-hr{height:1px;background:#222;margin:14px 0}
+.detail-label{font-size:10px;color:#555;font-weight:700;letter-spacing:.5px;margin-bottom:3px}
+.detail-val{font-size:14px;margin-bottom:14px;line-height:1.5}
+.detail-val a{color:#10b981;text-decoration:none}
+.detail-price{display:flex;gap:10px;align-items:baseline;margin:8px 0 14px}
+.detail-price-big{font-size:28px;font-weight:800;color:#10b981}
+.detail-price-old{font-size:14px;color:#555;text-decoration:line-through}
+.detail-btns{display:flex;gap:6px;margin-top:12px}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:#141414;border-radius:18px 18px 0 0;width:100%;max-width:430px;max-height:85dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-hdr{padding:14px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
+.modal-t{font-weight:700;font-size:15px}
+.modal-x{width:30px;height:30px;border-radius:50%;border:none;background:#222;color:#999;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:16px 18px 32px}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:10px;color:#555;font-weight:700;letter-spacing:.5px;margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #333;background:#1a1a1a;color:#f0f0f0;font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none;min-height:44px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:#10b981}
+.fld textarea{min-height:70px;resize:vertical}
+.fld-row{display:flex;gap:8px}
+.fld-row .fld{flex:1}
+.submit{width:100%;padding:14px;border-radius:12px;border:none;background:#10b981;color:#000;font-size:14px;font-weight:800;cursor:pointer;margin-top:6px;font-family:inherit}
+.submit:active{transform:scale(.98);opacity:.9}
+.cancel-btn{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#1a1a1a;color:#999;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;font-family:inherit}
+
+.hidden{display:none!important}
+</style>
+
+</head>
+<body>
+<div id="app">
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <button class="hdr-btn back-btn hidden" id="backBtn" onclick="goBack()">← Back</button>
+      <div class="logo" id="logoText">SOLE <span>INTEL</span></div>
+    </div>
+    <div style="display:flex;gap:5px">
+      <button class="hdr-btn" id="editBtn" onclick="startEdit()" style="display:none">✎</button>
+      <button class="hdr-btn" id="deleteBtn" onclick="deleteItem()" style="display:none;color:#ef4444">✕</button>
+      <button class="hdr-btn" id="addBtn" onclick="openAdd()" style="color:#10b981">+</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+
+  <div class="cnt" id="content"></div>
+
+  <!-- Tab Bar -->
+
+  <div class="tabs" id="tabBar">
+    <button class="tab on" data-tab="alerts" onclick="switchTab('alerts')"><span class="tab-icon">📡</span>ALERTS<span class="tab-badge hidden" id="alertBadge"></span></button>
+    <button class="tab" data-tab="contacts" onclick="switchTab('contacts')"><span class="tab-icon">👥</span>CONTACTS</button>
+    <button class="tab" data-tab="deals" onclick="switchTab('deals')"><span class="tab-icon">🎯</span>DEALS</button>
+    <button class="tab" data-tab="stores" onclick="switchTab('stores')"><span class="tab-icon">🏪</span>STORES</button>
+    <button class="tab" data-tab="visits" onclick="switchTab('visits')"><span class="tab-icon">📋</span>VISITS</button>
+  </div>
+</div>
+
+<!-- Modal Container -->
+
+<div class="overlay hidden" id="overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <span class="modal-t" id="modalTitle">Add</span>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+var contacts = [
+  {id:"c1",name:"Marcus Johnson",role:"Store Manager",store:"s1",phone:"214-555-0142",notes:"Very helpful. Holds clearance racks. Texts back fast.",lastContact:"2026-03-15"},
+  {id:"c2",name:"Diana Reyes",role:"Asst. Manager",store:"s4",phone:"832-555-0198",notes:"Knows clearance drop schedule. Best on Tuesday AM.",lastContact:"2026-03-22"},
+  {id:"c3",name:"Terrell Washington",role:"Store Manager",store:"s6",phone:"972-555-0311",notes:"Military discount no questions. Great for bulk buys.",lastContact:"2026-03-10"},
+  {id:"c4",name:"Sarah Kim",role:"Team Lead",store:"s7",phone:"210-555-0055",notes:"New contact. Very organized. Sends stock photos.",lastContact:"2026-03-28"},
+  {id:"c5",name:"James Ortega",role:"Store Manager",store:"s2",phone:"512-555-0277",notes:"Large clearance section in back of store.",lastContact:"2026-03-18"}
+];
+
+var deals = [
+  {id:"d1",title:"Ultraboost 22 – White",target:18,retail:90,store:"s1",status:"active",notes:"Hits 80% off during seasonal reset",sz:"10-12"},
+  {id:"d2",title:"NMD_R1 – Core Black",target:15,retail:75,store:"s4",status:"active",notes:"Katy Mills deep clearance regular",sz:"9-11"},
+  {id:"d3",title:"Forum Low – Cloud White",target:12,retail:60,store:"s6",status:"active",notes:"High margin flip $55-65 on StockX",sz:"8-13"},
+  {id:"d4",title:"Superstar – Black/White",target:16,retail:80,store:"s7",status:"watching",notes:"Always resells. Wait for 75%+ off",sz:"7-12"},
+  {id:"d5",title:"Stan Smith – Green",target:14,retail:70,store:"s2",status:"active",notes:"Round Rock had 20 pairs last visit",sz:"9-11"}
+];
+
+var visits = [];
+var STORES_DATA = [
+  {id:"s1",name:"Adidas – Allen Premium",city:"Allen",lat:33.1032,lng:-96.6706,addr:"820 W Stacy Rd, Allen, TX"},
+  {id:"s2",name:"Adidas – Round Rock",city:"Round Rock",lat:30.5621,lng:-97.665,addr:"4401 N I-35, Round Rock, TX"},
+  {id:"s3",name:"Adidas – San Marcos",city:"San Marcos",lat:29.836,lng:-97.97,addr:"3939 S I-35, San Marcos, TX"},
+  {id:"s4",name:"Adidas – Katy Mills",city:"Houston",lat:29.7755,lng:-95.8127,addr:"5000 Katy Mills Cir, Katy, TX"},
+  {id:"s5",name:"Adidas – Tanger Houston",city:"Houston",lat:29.5135,lng:-95.21,addr:"5885 Gulf Fwy, Texas City, TX"},
+  {id:"s6",name:"Adidas – Grand Prairie",city:"Dallas",lat:32.746,lng:-97.025,addr:"2602 Mayfield Rd, Grand Prairie, TX"},
+  {id:"s7",name:"Adidas – San Antonio",city:"San Antonio",lat:29.463,lng:-98.528,addr:"4015 S I-35, San Antonio, TX"}
+];
+
+var currentTab = "alerts";
+var detailView = null;
+var detailType = "";
+var userLat = null;
+var userLng = null;
+var radius = 30;
+var geoMsg = "Locating...";
+var searchText = "";
+var dealFilter = "all";
+var idCounter = Date.now();
+
+// ─── HELPERS ───
+function uid(){return "x"+(idCounter++)}
+function sn(id){var s=STORES_DATA.find(function(x){return x.id===id});return s?s.name:"Unknown"}
+function sc(id){var s=STORES_DATA.find(function(x){return x.id===id});return s?s.city:""}
+function fd(d){if(!d)return"-";var dt=new Date(d);return dt.toLocaleDateString("en-US",{month:"short",day:"numeric"})}
+function gd(a,b,c,d){var R=3959,p=Math.PI/180;var dL=(c-a)*p,dN=(d-b)*p;var x=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(a*p)*Math.cos(c*p)*Math.sin(dN/2)*Math.sin(dN/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+
+// ─── GEO ───
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(function(p){
+    userLat=p.coords.latitude;userLng=p.coords.longitude;geoMsg="GPS Active";render();
+  },function(){geoMsg="GPS Denied";render()},{enableHighAccuracy:true,timeout:10000});
+}else{geoMsg="No GPS"}
+
+// ─── NAV ───
+function switchTab(t){
+  currentTab=t;detailView=null;detailType="";searchText="";
+  document.querySelectorAll(".tab").forEach(function(el){el.classList.toggle("on",el.dataset.tab===t)});
+  document.getElementById("backBtn").classList.add("hidden");
+  document.getElementById("logoText").classList.remove("hidden");
+  document.getElementById("editBtn").style.display="none";
+  document.getElementById("deleteBtn").style.display="none";
+  document.getElementById("addBtn").style.display="";
+  document.getElementById("tabBar").classList.remove("hidden");
+  render();
+}
+
+function showDetail(type,id){
+  detailType=type;
+  if(type==="contact") detailView=contacts.find(function(c){return c.id===id});
+  if(type==="deal") detailView=deals.find(function(d){return d.id===id});
+  document.getElementById("backBtn").classList.remove("hidden");
+  document.getElementById("logoText").classList.add("hidden");
+  document.getElementById("editBtn").style.display="";
+  document.getElementById("deleteBtn").style.display="";
+  document.getElementById("addBtn").style.display="none";
+  document.getElementById("tabBar").classList.add("hidden");
+  render();
+}
+
+function goBack(){
+  detailView=null;detailType="";
+  document.getElementById("backBtn").classList.add("hidden");
+  document.getElementById("logoText").classList.remove("hidden");
+  document.getElementById("editBtn").style.display="none";
+  document.getElementById("deleteBtn").style.display="none";
+  document.getElementById("addBtn").style.display="";
+  document.getElementById("tabBar").classList.remove("hidden");
+  render();
+}
+
+// ─── RENDER ───
+function render(){
+  var el=document.getElementById("content");
+  var h="";
+
+  // Update alert badge
+  var nd=getNearbyDeals();
+  var badge=document.getElementById("alertBadge");
+  if(nd.length>0)badge.classList.remove("hidden");else badge.classList.add("hidden");
+
+  // ─── DETAIL ───
+  if(detailView){
+    if(detailType==="contact"){
+      var c=detailView;
+      h='<div class="detail">';
+      h+='<h2>'+esc(c.name)+'</h2>';
+      h+='<div class="detail-role">'+esc(c.role)+'</div>';
+      h+='<div class="detail-hr"></div>';
+      h+='<div class="detail-label">STORE</div><div class="detail-val">'+esc(sn(c.store))+'</div>';
+      h+='<div class="detail-label">PHONE</div><div class="detail-val"><a href="tel:'+esc(c.phone)+'">'+esc(c.phone)+'</a></div>';
+      h+='<div class="detail-label">NOTES</div><div class="detail-val">'+esc(c.notes||"-")+'</div>';
+      h+='<div class="detail-label">LAST CONTACT</div><div class="detail-val">'+fd(c.lastContact)+'</div>';
+      h+='<div class="detail-btns"><a class="act-btn act-p" href="tel:'+esc(c.phone)+'" style="flex:1">📞 Call</a><a class="act-btn" href="sms:'+esc(c.phone)+'" style="flex:1">💬 Text</a></div>';
+      h+='</div>';
+    }
+    if(detailType==="deal"){
+      var d=detailView;
+      var pct=Math.round((1-d.target/d.retail)*100);
+      h='<div class="detail">';
+      h+='<h2>'+esc(d.title)+'</h2>';
+      h+='<div class="detail-price"><span class="detail-price-big">$'+d.target+'</span><span class="detail-price-old">$'+d.retail+'</span><span class="tag tr">'+pct+'% off</span></div>';
+      h+='<div class="detail-hr"></div>';
+      h+='<div class="detail-label">STORE</div><div class="detail-val">'+esc(sn(d.store))+'</div>';
+      h+='<div class="detail-label">STATUS</div><div class="detail-val"><span class="tag '+(d.status==="active"?"tg":d.status==="watching"?"to":"tb")+'">'+d.status+'</span></div>';
+      if(d.sz){h+='<div class="detail-label">SIZES</div><div class="detail-val">'+esc(d.sz)+'</div>';}
+      h+='<div class="detail-label">NOTES</div><div class="detail-val">'+esc(d.notes||"-")+'</div>';
+      h+='<div class="detail-label">MARGIN PER PAIR</div><div class="detail-val" style="color:#10b981;font-weight:800;font-size:18px">$'+(d.retail-d.target)+'</div>';
+      h+='</div>';
+    }
+    el.innerHTML=h;return;
+  }
+
+  // ─── ALERTS ───
+  if(currentTab==="alerts"){
+    var ac=deals.filter(function(d){return d.status==="active"});
+    var avg=ac.length?Math.round(ac.reduce(function(s,d){return s+d.target},0)/ac.length):0;
+    h+='<div class="stats"><div class="stat"><div class="stat-v">'+ac.length+'</div><div class="stat-l">ACTIVE</div></div>';
+    h+='<div class="stat"><div class="stat-v">$'+avg+'</div><div class="stat-l">AVG TARGET</div></div>';
+    h+='<div class="stat"><div class="stat-v">'+contacts.length+'</div><div class="stat-l">CONTACTS</div></div>';
+    h+='<div class="stat"><div class="stat-v">'+visits.length+'</div><div class="stat-l">VISITS</div></div></div>';
+
+    h+='<div class="alert-box">';
+    h+='<div class="alert-hdr"><div class="alert-t"><span class="alert-dot"></span> Proximity Alerts</div><span style="font-size:10px;color:#555">'+geoMsg+'</span></div>';
+
+    if(geoMsg==="GPS Denied"){
+      h+='<div style="font-size:12px;color:#f59e0b;line-height:1.5">Enable Location in iPhone Settings → Safari to get proximity alerts near stores.</div>';
+    }
+    if(userLat!==null){
+      h+='<div class="radius-row"><label>Radius</label><input type="range" min="5" max="150" value="'+radius+'" oninput="updateRadius(this.value)"><span class="radius-val" id="radiusVal">'+radius+' mi</span></div>';
+
+      var ns=getNearbyStores();
+      nd=getNearbyDeals();
+
+      if(nd.length>0){
+        h+='<div style="margin-top:8px"><div style="font-size:11px;color:#10b981;font-weight:700;margin-bottom:6px">🎯 '+nd.length+' DEAL'+(nd.length>1?"S":"")+' IN RANGE</div>';
+        nd.forEach(function(d){
+          h+='<div class="nearby" onclick="switchTab(\'deals\');showDetail(\'deal\',\''+d.id+'\')"><div><div class="nearby-name">'+esc(d.title)+'</div><div class="nearby-store">'+esc(d.storeName)+'</div></div><div style="text-align:right"><div class="nearby-dist">'+d.distance.toFixed(1)+' mi</div><div class="nearby-price">$'+d.target+'</div></div></div>';
+        });
+        h+='</div>';
+      }
+
+      if(ns.length>0){
+        h+='<div style="margin-top:14px"><div style="font-size:11px;color:#999;font-weight:700;margin-bottom:6px">STORES IN RANGE</div>';
+        ns.forEach(function(s){
+          h+='<div class="nearby"><div><div class="nearby-name">'+esc(s.name)+'</div><div class="nearby-addr">'+esc(s.addr)+'</div></div><div class="nearby-dist">'+s.distance.toFixed(1)+' mi</div></div>';
+        });
+        h+='</div>';
+      }
+      if(ns.length===0){
+        h+='<div style="text-align:center;padding:16px;color:#555;font-size:12px">No stores within '+radius+' mi. Try increasing radius.</div>';
+      }
+    }
+    h+='</div>';
+  }
+
+  // ─── CONTACTS ───
+  if(currentTab==="contacts"){
+    h+='<input class="search" placeholder="Search contacts..." oninput="searchText=this.value;render()" value="'+esc(searchText)+'">';
+    var fc=contacts.filter(function(c){
+      if(!searchText)return true;
+      var q=searchText.toLowerCase();
+      return c.name.toLowerCase().indexOf(q)>=0||sn(c.store).toLowerCase().indexOf(q)>=0;
+    });
+    h+='<div class="sec-hdr"><span class="sec-t">CONTACTS</span><span class="sec-t">'+fc.length+'</span></div>';
+    if(fc.length===0)h+='<div class="empty">No contacts found</div>';
+    fc.forEach(function(c){
+      h+='<div class="card" onclick="showDetail(\'contact\',\''+c.id+'\')">';
+      h+='<div class="card-top"><div class="card-row"><div><div class="card-name">'+esc(c.name)+'</div><div class="card-sub">'+esc(c.role)+'</div><div class="card-sub2">'+esc(sn(c.store))+'</div></div><span class="tag tg" style="font-size:9px">'+esc(sc(c.store))+'</span></div>';
+      h+='<div class="card-notes">'+esc(c.notes)+'</div>';
+      h+='<div class="card-tags"><span class="tag tb">Last: '+fd(c.lastContact)+'</span></div></div>';
+      h+='<div class="card-acts"><a class="act-btn act-p" href="tel:'+esc(c.phone)+'" onclick="event.stopPropagation()">📞 Call</a><a class="act-btn" href="sms:'+esc(c.phone)+'" onclick="event.stopPropagation()">💬 Text</a></div>';
+      h+='</div>';
+    });
+  }
+
+  // ─── DEALS ───
+  if(currentTab==="deals"){
+    h+='<input class="search" placeholder="Search deals..." oninput="searchText=this.value;render()" value="'+esc(searchText)+'">';
+    h+='<div class="filters">';
+    ["all","active","watching","purchased"].forEach(function(f){
+      h+='<button class="fchip'+(dealFilter===f?" on":"")+'" onclick="dealFilter=\''+f+'\';render()">'+f.charAt(0).toUpperCase()+f.slice(1)+'</button>';
+    });
+    h+='</div>';
+    var fd2=deals.filter(function(d){
+      if(dealFilter!=="all"&&d.status!==dealFilter)return false;
+      if(!searchText)return true;
+      return d.title.toLowerCase().indexOf(searchText.toLowerCase())>=0;
+    });
+    h+='<div class="sec-hdr"><span class="sec-t">DEAL TARGETS</span><span class="sec-t">'+fd2.length+'</span></div>';
+    fd2.forEach(function(d){
+      var pct=Math.round((1-d.target/d.retail)*100);
+      h+='<div class="card" onclick="showDetail(\'deal\',\''+d.id+'\')">';
+      h+='<div class="card-top"><div class="card-row"><div><div class="card-name">'+esc(d.title)+'</div><div class="card-sub2">'+esc(sn(d.store))+'</div></div><div class="card-price"><div class="card-price-main">$'+d.target+'</div><div class="card-price-old">$'+d.retail+'</div></div></div>';
+      h+='<div class="card-notes">'+esc(d.notes)+'</div>';
+      h+='<div class="card-tags"><span class="tag '+(d.status==="active"?"tg":d.status==="watching"?"to":"tb")+'">'+d.status+'</span>';
+      if(d.sz)h+='<span class="tag tb">Sz '+esc(d.sz)+'</span>';
+      h+='<span class="tag tr">'+pct+'% off</span></div></div>';
+      h+='<div class="card-acts"><button class="act-btn" onclick="event.stopPropagation();cycleStatus(\''+d.id+'\')">↻ Cycle Status</button></div>';
+      h+='</div>';
+    });
+  }
+
+  // ─── STORES ───
+  if(currentTab==="stores"){
+    h+='<div class="sec-hdr"><span class="sec-t">ADIDAS OUTLETS</span><span class="sec-t">'+STORES_DATA.length+'</span></div>';
+    var ss=STORES_DATA.map(function(s){
+      var dd=userLat!==null?gd(userLat,userLng,s.lat,s.lng):null;
+      var dc=deals.filter(function(d){return d.store===s.id&&d.status==="active"}).length;
+      var cc=contacts.filter(function(c){return c.store===s.id}).length;
+      return{id:s.id,name:s.name,addr:s.addr,city:s.city,dd:dd,dc:dc,cc:cc};
+    }).sort(function(a,b){return(a.dd||999)-(b.dd||999)});
+    ss.forEach(function(s){
+      h+='<div class="card">';
+      h+='<div class="card-top"><div class="card-row"><div><div class="card-name">'+esc(s.name)+'</div><div class="card-sub2">'+esc(s.addr)+'</div></div>';
+      if(s.dd!==null)h+='<div style="font-size:12px;color:#10b981;font-weight:700">'+s.dd.toFixed(0)+' mi</div>';
+      h+='</div><div class="card-tags"><span class="tag tb">'+s.cc+' contacts</span><span class="tag tg">'+s.dc+' deals</span></div></div>';
+      h+='<div class="card-acts"><a class="act-btn act-p" href="maps://?q='+encodeURIComponent(s.addr)+'">📍 Directions</a></div>';
+      h+='</div>';
+    });
+  }
+
+  // ─── VISITS ───
+  if(currentTab==="visits"){
+    h+='<div class="sec-hdr"><span class="sec-t">VISIT LOG</span><span class="sec-t">'+visits.length+'</span></div>';
+    if(visits.length===0)h+='<div class="empty">No visits yet. Tap + to log one.</div>';
+    else{
+      h+='<div class="timeline">';
+      visits.forEach(function(v,i){
+        h+='<div class="tl-item"><div class="tl-dot-col"><div class="tl-dot"></div>'+(i<visits.length-1?'<div class="tl-line"></div>':'')+'</div>';
+        h+='<div class="tl-body"><div class="tl-store">'+esc(sn(v.store))+'</div><div class="tl-date">'+fd(v.date)+'</div>';
+        if(v.notes)h+='<div class="tl-notes">'+esc(v.notes)+'</div>';
+        if(v.purchases){
+          h+='<div class="tl-tags">';
+          v.purchases.split(",").forEach(function(p){h+='<span class="tl-tag">'+esc(p.trim())+'</span>'});
+          h+='</div>';
+        }
+        if(v.spent)h+='<div class="tl-spent">Spent: $'+esc(v.spent)+'</div>';
+        h+='</div></div>';
+      });
+      h+='</div>';
+    }
+  }
+
+  el.innerHTML=h;
+}
+
+// ─── COMPUTED ───
+function getNearbyStores(){
+  if(!userLat)return[];
+  return STORES_DATA.map(function(s){return{id:s.id,name:s.name,addr:s.addr,distance:gd(userLat,userLng,s.lat,s.lng)}}).filter(function(s){return s.distance<=radius}).sort(function(a,b){return a.distance-b.distance});
+}
+function getNearbyDeals(){
+  var ns=getNearbyStores();
+  var nd=[];
+  ns.forEach(function(s){
+    deals.forEach(function(d){
+      if(d.store===s.id&&d.status==="active")nd.push({id:d.id,title:d.title,target:d.target,retail:d.retail,store:d.store,status:d.status,notes:d.notes,sz:d.sz,storeName:s.name,distance:s.distance});
+    });
+  });
+  return nd;
+}
+
+// ─── ACTIONS ───
+function updateRadius(v){radius=parseInt(v);document.getElementById("radiusVal").textContent=v+" mi";render()}
+function cycleStatus(id){
+  deals=deals.map(function(d){
+    if(d.id!==id)return d;
+    var n=d.status==="active"?"purchased":d.status==="purchased"?"watching":"active";
+    return Object.assign({},d,{status:n});
+  });
+  render();
+}
+function deleteItem(){
+  if(!detailView)return;
+  if(detailType==="contact")contacts=contacts.filter(function(c){return c.id!==detailView.id});
+  if(detailType==="deal")deals=deals.filter(function(d){return d.id!==detailView.id});
+  goBack();
+}
+function startEdit(){
+  if(!detailView)return;
+  if(detailType==="contact")openEditContact();
+  if(detailType==="deal")openEditDeal();
+}
+
+// ─── MODALS ───
+function closeModal(){document.getElementById("overlay").classList.add("hidden")}
+function openModal(title,html){
+  document.getElementById("modalTitle").textContent=title;
+  document.getElementById("modalBody").innerHTML=html;
+  document.getElementById("overlay").classList.remove("hidden");
+}
+
+function storeOptions(sel){
+  return STORES_DATA.map(function(s){return'<option value="'+s.id+'"'+(sel===s.id?" selected":"")+'>'+esc(s.name)+'</option>'}).join("");
+}
+
+function openAdd(){
+  if(currentTab==="contacts")openAddContact();
+  if(currentTab==="deals")openAddDeal();
+  if(currentTab==="visits")openAddVisit();
+}
+
+function openAddContact(){
+  var h='<div class="fld"><label>NAME</label><input id="f_name" placeholder="Contact name"></div>';
+  h+='<div class="fld-row"><div class="fld"><label>ROLE</label><select id="f_role"><option>Store Manager</option><option>Asst. Manager</option><option>Team Lead</option><option>Sales Associate</option></select></div>';
+  h+='<div class="fld"><label>STORE</label><select id="f_store">'+storeOptions("")+'</select></div></div>';
+  h+='<div class="fld"><label>PHONE</label><input id="f_phone" type="tel" placeholder="555-123-4567"></div>';
+  h+='<div class="fld"><label>NOTES</label><textarea id="f_notes" placeholder="Intel notes..."></textarea></div>';
+
+h+=’<button class="submit" onclick="submitAddContact()">Add Contact</button>’;
+openModal(“New Contact”,h);
+}
+
+function submitAddContact(){
+var n=document.getElementById(“f_name”).value;if(!n)return;
+contacts.push({id:uid(),name:n,role:document.getElementById(“f_role”).value,store:document.getElementById(“f_store”).value,phone:document.getElementById(“f_phone”).value,notes:document.getElementById(“f_notes”).value,lastContact:new Date().toISOString().split(“T”)[0]});
+closeModal();render();
+}
+
+function openEditContact(){
+var c=detailView;
+var h=’<div class="fld"><label>NAME</label><input id="f_name" value="'+esc(c.name)+'"></div>’;
+h+=’<div class="fld-row"><div class="fld"><label>ROLE</label><select id="f_role"><option’+(c.role===“Store Manager”?” selected”:””)+’>Store Manager</option><option’+(c.role===“Asst. Manager”?” selected”:””)+’>Asst. Manager</option><option’+(c.role===“Team Lead”?” selected”:””)+’>Team Lead</option><option’+(c.role===“Sales Associate”?” selected”:””)+’>Sales Associate</option></select></div>’;
+h+=’<div class="fld"><label>STORE</label><select id="f_store">’+storeOptions(c.store)+’</select></div></div>’;
+h+=’<div class="fld"><label>PHONE</label><input id="f_phone" type="tel" value="'+esc(c.phone)+'"></div>’;
+h+=’<div class="fld"><label>NOTES</label><textarea id="f_notes">’+esc(c.notes||””)+’</textarea></div>’;
+h+=’<button class="submit" onclick="submitEditContact()">Update Contact</button>’;
+openModal(“Edit Contact”,h);
+}
+
+function submitEditContact(){
+var n=document.getElementById(“f_name”).value;if(!n)return;
+contacts=contacts.map(function(c){
+if(c.id!==detailView.id)return c;
+return Object.assign({},c,{name:n,role:document.getElementById(“f_role”).value,store:document.getElementById(“f_store”).value,phone:document.getElementById(“f_phone”).value,notes:document.getElementById(“f_notes”).value});
+});
+detailView=contacts.find(function(c){return c.id===detailView.id});
+closeModal();render();
+}
+
+function openAddDeal(){
+var h=’<div class="fld"><label>SHOE NAME</label><input id="f_title" placeholder="e.g. Ultraboost 22"></div>’;
+h+=’<div class="fld-row"><div class="fld"><label>TARGET $</label><input id="f_target" type="number" placeholder="18"></div>’;
+h+=’<div class="fld"><label>RETAIL $</label><input id="f_retail" type="number" placeholder="90"></div></div>’;
+h+=’<div class="fld-row"><div class="fld"><label>STORE</label><select id="f_store">’+storeOptions(””)+’</select></div>’;
+h+=’<div class="fld"><label>SIZES</label><input id="f_sz" placeholder="9-12"></div></div>’;
+h+=’<div class="fld"><label>STATUS</label><select id="f_status"><option value="active">Active</option><option value="watching">Watching</option></select></div>’;
+h+=’<div class="fld"><label>NOTES</label><textarea id="f_notes" placeholder="Resale value, tips..."></textarea></div>’;
+h+=’<button class="submit" onclick="submitAddDeal()">Add Deal</button>’;
+openModal(“New Deal Target”,h);
+}
+
+function submitAddDeal(){
+var t=document.getElementById(“f_title”).value;if(!t)return;
+deals.push({id:uid(),title:t,target:parseInt(document.getElementById(“f_target”).value)||0,retail:parseInt(document.getElementById(“f_retail”).value)||0,store:document.getElementById(“f_store”).value,status:document.getElementById(“f_status”).value,notes:document.getElementById(“f_notes”).value,sz:document.getElementById(“f_sz”).value});
+closeModal();render();
+}
+
+function openEditDeal(){
+var d=detailView;
+var h=’<div class="fld"><label>SHOE NAME</label><input id="f_title" value="'+esc(d.title)+'"></div>’;
+h+=’<div class="fld-row"><div class="fld"><label>TARGET $</label><input id="f_target" type="number" value="'+d.target+'"></div>’;
+h+=’<div class="fld"><label>RETAIL $</label><input id="f_retail" type="number" value="'+d.retail+'"></div></div>’;
+h+=’<div class="fld-row"><div class="fld"><label>STORE</label><select id="f_store">’+storeOptions(d.store)+’</select></div>’;
+h+=’<div class="fld"><label>SIZES</label><input id=“f_sz” value=”’+esc(d.sz||””)+’”></div></div>’;
+h+=’<div class="fld"><label>STATUS</label><select id="f_status"><option value=“active”’+(d.status===“active”?” selected”:””)+’>Active</option><option value=“watching”’+(d.status===“watching”?” selected”:””)+’>Watching</option><option value=“purchased”’+(d.status===“purchased”?” selected”:””)+’>Purchased</option></select></div>’;
+h+=’<div class="fld"><label>NOTES</label><textarea id="f_notes">’+esc(d.notes||””)+’</textarea></div>’;
+h+=’<button class="submit" onclick="submitEditDeal()">Update Deal</button>’;
+openModal(“Edit Deal”,h);
+}
+
+function submitEditDeal(){
+var t=document.getElementById(“f_title”).value;if(!t)return;
+deals=deals.map(function(d){
+if(d.id!==detailView.id)return d;
+return Object.assign({},d,{title:t,target:parseInt(document.getElementById(“f_target”).value)||0,retail:parseInt(document.getElementById(“f_retail”).value)||0,store:document.getElementById(“f_store”).value,status:document.getElementById(“f_status”).value,notes:document.getElementById(“f_notes”).value,sz:document.getElementById(“f_sz”).value});
+});
+detailView=deals.find(function(d){return d.id===detailView.id});
+closeModal();render();
+}
+
+function openAddVisit(){
+var h=’<div class="fld"><label>STORE</label><select id="f_store">’+storeOptions(””)+’</select></div>’;
+h+=’<div class="fld"><label>PURCHASES (comma separated)</label><input id="f_purchases" placeholder="Ultraboost 22 x2, NMD x1"></div>’;
+h+=’<div class="fld"><label>TOTAL SPENT</label><input id="f_spent" type="number" placeholder="45"></div>’;
+h+=’<div class="fld"><label>NOTES</label><textarea id="f_notes" placeholder="Clearance restocked..."></textarea></div>’;
+h+=’<button class="submit" onclick="submitAddVisit()">Log Visit</button>’;
+openModal(“Log Visit”,h);
+}
+
+function submitAddVisit(){
+visits.unshift({id:uid(),store:document.getElementById(“f_store”).value,purchases:document.getElementById(“f_purchases”).value,spent:document.getElementById(“f_spent”).value,notes:document.getElementById(“f_notes”).value,date:new Date().toISOString().split(“T”)[0]});
+closeModal();render();
+}
+
+// ─── INIT ───
+render();
+</script>
+
+</body>
+</html>
